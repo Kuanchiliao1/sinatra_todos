@@ -1,7 +1,13 @@
 require "sinatra"
 require "sinatra/reloader"
-require "tilt/erubis"
+require "tilt/erubis" # ERB templates
+
+
 
 get "/" do
-  erb "You have no lists.", layout: :layout
+  @list = [
+    {name: "Lunch Groceries"},
+    {name: "Dinner Groceries"}
+  ]
+  erb :lists, layout: :layout
 end
