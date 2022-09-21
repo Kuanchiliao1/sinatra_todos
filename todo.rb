@@ -1,5 +1,6 @@
 require "sinatra"
 require "sinatra/reloader"
+require "sinatra/content_for"
 require "tilt/erubis" # ERB templates
 
 configure do
@@ -28,6 +29,13 @@ get "/lists/new" do
   erb :new_list, layout: :layout
 end
 
+# View any individual list
+get "/lists/:id" do
+  id = params[:id].to_i
+  @list = session[:lists][id]
+  erb :list, layout: :layout
+end
+
 # Return an error msg if name is invalid. Return nil if name is valid.
 def error_for_list_name(name)
   if !(1..100).cover? name.size
@@ -41,7 +49,8 @@ end
 post "/lists" do
   list_name = params[:list_name].strip
 
-  if error = error_for_list_name(list_name)
+  error = error_for_list_name(list_name)
+  if error
     session[:error] = error
     erb :new_list, layout: :layout
   else
