@@ -31,9 +31,41 @@ end
 
 # View any individual list
 get "/lists/:id" do
+  @id = params[:id].to_i
+  @list = session[:lists][@id]
+  erb :list, layout: :layout
+end
+
+# Edit an existing todo list
+get "/lists/:id/edit" do
   id = params[:id].to_i
   @list = session[:lists][id]
-  erb :list, layout: :layout
+  erb :list_edit
+end
+
+# Delete the todo list
+post "/lists/:id/destroy" do
+  id = params[:id].to_i
+  session[:lists].delete_at(id)
+  session[:success] = "The list has been deleted"
+  redirect "/lists"
+end
+
+# Updating an existing todo list
+post "/lists/:id" do
+  list_name = params[:list_name].strip
+  id = params[:id].to_i
+  @list = session[:lists][id]
+
+  error = error_for_list_name(list_name)
+  if error
+    session[:error] = error
+    erb :list_edit, layout: :layout
+  else
+    @list[:name] = list_name
+    session[:success] = "The list has been updated."
+    redirect "/lists/#{id}"
+  end
 end
 
 # Return an error msg if name is invalid. Return nil if name is valid.
@@ -59,3 +91,4 @@ post "/lists" do
     redirect "/lists"
   end
 end
+
