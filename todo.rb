@@ -44,6 +44,17 @@ get "/lists/:id/edit" do
   erb :list_edit
 end
 
+# Delete a todo from list
+post "/lists/:list_id/todos/:todo_id/destroy" do
+  @list_id = params[:list_id].to_i
+  todo_id = params[:todo_id].to_i
+  @list = session[:lists][@list_id]
+
+  @list[:todos].delete_at(todo_id)
+  session[:success] = "The todo has been deleted."
+  redirect "/lists/#{@list_id}"
+end
+
 # Delete the todo list
 post "/lists/:id/destroy" do
   binding.pry
@@ -52,7 +63,6 @@ post "/lists/:id/destroy" do
   session[:success] = "The list has been deleted"
   redirect "/lists"
 end
-
 
 # Add new todo to list
 post "/lists/:list_id/todos" do
