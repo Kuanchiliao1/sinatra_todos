@@ -76,6 +76,16 @@ post "/lists/:list_id/todos/:todo_id" do
   redirect "/lists/#{@list_id}"
 end
 
+# Mark all todos complete for a list
+post "/lists/:list_id/complete_all" do
+  @list_id = params[:list_id].to_i
+  @list = session[:lists][@list_id]
+
+  @list[:todos].each {|hash| hash[:completed] = true}
+  session[:success] = "All todos have been completed."
+  redirect "/lists/#{@list_id}"
+end
+
 # Add new todo to list
 post "/lists/:list_id/todos" do
   @list_id = params[:id].to_i
@@ -95,7 +105,6 @@ end
 
 # Updating an existing todo list
 post "/lists/:id" do
-  binding.pry
   list_name = params[:list_name].strip
   id = params[:id].to_i
   @list = session[:lists][id]
