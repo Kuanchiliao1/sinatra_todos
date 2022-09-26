@@ -2,6 +2,7 @@ require "sinatra"
 require "sinatra/reloader"
 require "sinatra/content_for"
 require "tilt/erubis" # ERB templates
+require "pry"
 
 configure do
   enable :sessions # Activate Sinatra's session support
@@ -31,8 +32,8 @@ end
 
 # View any individual list
 get "/lists/:id" do
-  @id = params[:id].to_i
-  @list = session[:lists][@id]
+  @list_id = params[:id].to_i
+  @list = session[:lists][@list_id]
   erb :list, layout: :layout
 end
 
@@ -45,14 +46,34 @@ end
 
 # Delete the todo list
 post "/lists/:id/destroy" do
+  binding.pry
   id = params[:id].to_i
   session[:lists].delete_at(id)
   session[:success] = "The list has been deleted"
   redirect "/lists"
 end
 
+
+# Add new todo to list
+post "/lists/:list_id/todos" do
+  @list_id = params[:id].to_i
+  @list = session[:lists][@list_id]
+  text = params[:todo].strip
+
+  error = error_for_todos(text)
+  if error
+    session[:error] =  error
+    erb :list, layout: :layout
+  else
+    @list[:todos] << {name: text, completed: false}
+    session[:success] = "The todo was added."
+    redirect "/lists/#{@list_id}"
+  end
+end
+
 # Updating an existing todo list
 post "/lists/:id" do
+  binding.pry
   list_name = params[:list_name].strip
   id = params[:id].to_i
   @list = session[:lists][id]
@@ -74,6 +95,13 @@ def error_for_list_name(name)
     "List name must be between 1 and 100 chars."
   elsif session[:lists].any? {|list| list[:name] == name }
     "List name must be unique."
+  end
+end
+
+# Return an error msg if name is invalid. Return nil if name is valid.
+def error_for_todos(name)
+  if !(1..100).cover? name.size
+    "Todo must be between 1 and 100 chars."
   end
 end
 
