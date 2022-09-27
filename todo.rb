@@ -9,6 +9,28 @@ configure do
   set :session_secret, 'secret' # If not specific, Sinatra will create random secret everytime it starts
 end
 
+# These methods are accessible in ANY view templates AND in this file
+# Try not to put methods that aren't intended for use in template in here
+helpers do 
+  def list_complete?(list)
+    list[:todos].size > 0 && list[:todos].all? { |todo| todo[:completed] }
+  end
+
+  def list_class(list)
+    "complete" if list_complete?(list)
+  end
+
+  def todos_count(list)
+    list[:todos].size
+  end
+
+  def todos_remaining_count(list)
+    list[:todos].count do | hash |
+      hash[:completed] = "complete"
+    end
+  end
+end
+
 # This block is ran before each request is handled
 before do
   # Allows the rest of our code to assume session exists

@@ -1,15 +1,11 @@
-<% if session[:success] %>
-  <div class="flash success">
-    <p><%= session.delete(:success) %></p>
-  </div>
-<% end %>
-
 <ul id="lists">
   <% @list.each_with_index do |list, index| %>
-    <li>
+    <li class="<%= list_class(list) %>">
       <a>
         <a href="/lists/<%= index %>"><%= list[:name] %></a> 
-        <p><%= list[:todos].size %></p>
+        <p>
+          <%= todos_remaining_count(list) %> / <%= todos_count(list) %>
+        </p>
       </a>
     </li>
   <% end %>
