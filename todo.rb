@@ -7,7 +7,7 @@ require "pry"
 # Test heroku1
 
 configure do
-  enable :sessions # Activate Sinatra's session support
+  enable :sessions 
   set :session_secret, 'secret' # If not specific, Sinatra will create random secret everytime it starts
 end
 
